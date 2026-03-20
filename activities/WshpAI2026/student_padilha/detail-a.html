@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Alessi Still · Detail</title>
+  <style>
+    :root{
+      --bg:#f2efe7;
+      --muted:#6a6a6a;
+
+      --tile-h: 280px;
+      --tile-gap: 22px;
+
+      --hover-scale: 1.22;
+      --hover-ms: 220ms;
+
+      --scroll-sensitivity: 0.6;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      background:var(--bg);
+      font-family: Arial, Helvetica, sans-serif;
+      overscroll-behavior: none;
+    }
+
+    .topbar{
+      position:fixed;
+      top:0; left:0; right:0;
+      height:56px;
+      display:flex;
+      align-items:center;
+      padding:0 18px;
+      background:linear-gradient(to bottom, rgba(242,239,231,0.98), rgba(242,239,231,0.90));
+      backdrop-filter:saturate(120%) blur(6px);
+      border-bottom:1px solid rgba(0,0,0,0.08);
+      z-index:20;
+    }
+
+    .icon-btn{
+      width:38px;
+      height:38px;
+      border-radius:999px;
+      border:1px solid rgba(0,0,0,0.10);
+      background:rgba(255,255,255,0.25);
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      cursor:pointer;
+      user-select:none;
+      padding:0;
+    }
+    .icon-btn:hover{opacity:0.86}
+    .icon{
+      width:16px;
+      height:16px;
+      display:block;
+      stroke:var(--muted);
+      stroke-width:2;
+      fill:none;
+      stroke-linecap:round;
+      stroke-linejoin:round;
+    }
+
+    .spacer{height:200vh}
+
+    .stage{
+      position:sticky;
+      top:0;
+      height:100vh;
+      padding-top:56px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+    }
+
+    .rail{
+      height:var(--tile-h);
+      display:flex;
+      gap:var(--tile-gap);
+      padding:0 8vw;
+      align-items:center;
+      will-change: transform;
+      transform: translate3d(0,0,0);
+    }
+
+    .tile{
+      height:100%;
+      flex:0 0 auto;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      cursor:pointer;
+      transform-origin:center center;
+      transition: transform var(--hover-ms) ease;
+      z-index:1;
+      position:relative;
+    }
+
+    .tile img{
+      height:100%;
+      width:auto;
+      display:block;
+      object-fit:contain;
+      border:1px solid rgba(0,0,0,0.10);
+      background:rgba(255,255,255,0.35);
+    }
+
+    .tile:hover{
+      transform: scale(var(--hover-scale));
+      z-index:5;
+    }
+
+    .lightbox{
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,0.82);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      z-index:50;
+    }
+    .lightbox.on{display:flex}
+
+    .lb-inner{
+      position:relative;
+      width:min(92vw, 1400px);
+      height:min(86vh, 900px);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .lb-img{
+      max-width:100%;
+      max-height:100%;
+      width:auto;
+      height:auto;
+      transform: scale(1);
+      transform-origin:center center;
+      will-change: transform;
+      user-select:none;
+      -webkit-user-drag:none;
+    }
+
+    .lb-top{
+      position:absolute;
+      top:10px;
+      right:10px;
+      display:flex;
+      gap:10px;
+      z-index:5;
+    }
+
+    .icon-light{
+      stroke:rgba(242,239,231,0.92);
+      border-color:rgba(242,239,231,0.25);
+      background:rgba(0,0,0,0.25);
+    }
+    .icon-light .icon{stroke:rgba(242,239,231,0.92)}
+
+    .lb-nav{
+      position:absolute;
+      top:50%;
+      transform:translateY(-50%);
+      z-index:5;
+    }
+    .lb-prev{left:10px}
+    .lb-next{right:10px}
+
+    @media (max-width: 860px){
+      :root{ --tile-h: 240px; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="topbar">
+    <button class="icon-btn" id="backBtn" type="button" aria-label="Back to details">
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M15 18l-6-6 6-6"></path>
+      </svg>
+    </button>
+  </div>
+
+  <div class="spacer" id="spacer">
+    <div class="stage">
+      <div class="rail" id="rail" aria-label="Horizontal carousel">
+        <div class="tile" data-src="image (23).png"><img src="image (23).png" alt="Product image 1" loading="eager"></div>
+        <div class="tile" data-src="image (25).png"><img src="image (25).png" alt="Product image 2" loading="lazy"></div>
+        <div class="tile" data-src="image (26).png"><img src="image (26).png" alt="Product image 3" loading="lazy"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="lightbox" id="lightbox" aria-hidden="true">
+    <div class="lb-inner">
+      <div class="lb-top">
+        <button class="icon-btn icon-light" id="lbClose" type="button" aria-label="Close">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M18 6L6 18"></path>
+            <path d="M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+
+      <button class="icon-btn icon-light lb-nav lb-prev" id="lbPrev" type="button" aria-label="Previous">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M15 18l-6-6 6-6"></path>
+        </svg>
+      </button>
+
+      <img class="lb-img" id="lbImg" alt="Large view">
+
+      <button class="icon-btn icon-light lb-nav lb-next" id="lbNext" type="button" aria-label="Next">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M9 6l6 6-6 6"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      const rail = document.getElementById("rail");
+      const spacer = document.getElementById("spacer");
+      const tiles = Array.from(rail.querySelectorAll(".tile"));
+      const backBtn = document.getElementById("backBtn");
+
+      const SENS = Number(getComputedStyle(document.documentElement).getPropertyValue("--scroll-sensitivity")) || 0.6;
+
+      let maxX = 0;
+      let scrollMax = 0;
+      let didInit = false;
+
+      function clamp(v,a,b){ return Math.max(a, Math.min(b, v)); }
+
+      // Inverted mapping:
+      // scroll UP -> images move left -> right
+      function onScroll(){
+        const y = window.scrollY;
+        const x = clamp((scrollMax - y) * SENS, 0, maxX);
+        rail.style.transform = `translate3d(${-x}px,0,0)`;
+      }
+
+      function recalc(){
+        maxX = Math.max(0, rail.scrollWidth - window.innerWidth);
+
+        const needed = Math.max(window.innerHeight * 1.4, (maxX / Math.max(0.01, SENS)) + window.innerHeight);
+        spacer.style.height = `${needed}px`;
+
+        scrollMax = Math.max(0, (needed - window.innerHeight));
+
+        // open page in the middle of the image line
+        if (!didInit){
+          window.scrollTo(0, scrollMax / 2);
+          didInit = true;
+        }
+
+        onScroll();
+      }
+
+      window.addEventListener("resize", recalc, { passive:true });
+      window.addEventListener("scroll", onScroll, { passive:true });
+      window.addEventListener("load", recalc);
+      setTimeout(recalc, 180);
+
+      backBtn.addEventListener("click", () => {
+        window.location.href = "index.html#details";
+      });
+
+      // Lightbox
+      const lb = document.getElementById("lightbox");
+      const lbImg = document.getElementById("lbImg");
+      const lbClose = document.getElementById("lbClose");
+      const lbPrev = document.getElementById("lbPrev");
+      const lbNext = document.getElementById("lbNext");
+
+      let activeIndex = 0;
+      let zoom = 1;
+
+      function openLB(i){
+        activeIndex = i;
+        zoom = 1;
+        lbImg.style.transform = `scale(${zoom})`;
+        lbImg.src = tiles[activeIndex].dataset.src;
+        lb.classList.add("on");
+        lb.setAttribute("aria-hidden","false");
+      }
+
+      function closeLB(){
+        lb.classList.remove("on");
+        lb.setAttribute("aria-hidden","true");
+        lbImg.src = "";
+      }
+
+      function prev(){
+        activeIndex = (activeIndex - 1 + tiles.length) % tiles.length;
+        zoom = 1;
+        lbImg.style.transform = `scale(${zoom})`;
+        lbImg.src = tiles[activeIndex].dataset.src;
+      }
+
+      function next(){
+        activeIndex = (activeIndex + 1) % tiles.length;
+        zoom = 1;
+        lbImg.style.transform = `scale(${zoom})`;
+        lbImg.src = tiles[activeIndex].dataset.src;
+      }
+
+      tiles.forEach((t, i) => t.addEventListener("click", () => openLB(i)));
+
+      lbClose.addEventListener("click", closeLB);
+      lbPrev.addEventListener("click", prev);
+      lbNext.addEventListener("click", next);
+
+      lb.addEventListener("click", (e) => {
+        const inner = document.querySelector(".lb-inner");
+        if (!inner.contains(e.target)) closeLB();
+      });
+
+      window.addEventListener("keydown", (e) => {
+        if (!lb.classList.contains("on")) return;
+        if (e.key === "Escape") closeLB();
+        if (e.key === "ArrowLeft") prev();
+        if (e.key === "ArrowRight") next();
+      });
+
+      // Zoom with wheel inside lightbox
+      lb.addEventListener("wheel", (e) => {
+        if (!lb.classList.contains("on")) return;
+        e.preventDefault();
+        const factor = e.deltaY > 0 ? 0.92 : 1.08;
+        zoom = clamp(zoom * factor, 1, 4);
+        lbImg.style.transform = `scale(${zoom})`;
+      }, { passive:false });
+    })();
+  </script>
+</body>
+</html>
